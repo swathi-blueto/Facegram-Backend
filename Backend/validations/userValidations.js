@@ -23,3 +23,13 @@ export const profileSchema = Joi.object({
   profile_pic: Joi.any(),
   cover_photo: Joi.any()
 });
+
+
+// In your validation file (userValidations.js)
+export const createPostSchema = Joi.object({
+  user_id: Joi.string().required(),
+  content: Joi.string().allow('').optional(),
+  visibility: Joi.string().valid('public', 'friends', 'private').required(),
+  // Removed image_url validation here
+  image_file:Joi.any()
+});

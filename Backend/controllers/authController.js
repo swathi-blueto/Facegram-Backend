@@ -2,9 +2,9 @@ import { Login, Signup,Logout } from "../services/authService.js";
 
 export const register = async (req, res) => {
   try {
-    const { firstname, lastname,email,password } = req.body;
+    const { first_name, last_name,email,password } = req.body;
     
-    const response = await Signup({ firstname, lastname,email,password});
+    const response = await Signup({ first_name, last_name,email,password});
     res.status(201).send(response);
   } catch (error) {
     res.status(400).send({ error: error.message });
