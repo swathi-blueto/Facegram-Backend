@@ -25,7 +25,7 @@ export const unblockUserService = async (userId) => {
   return { userId };
 };
 
-// POSTS
+
 export const getAllPostsService = async () => {
   const { data, error } = await supabase.from("posts").select("*");
   if (error) throw new Error("Failed to fetch posts: " + error.message);
