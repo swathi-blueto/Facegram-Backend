@@ -24,8 +24,8 @@ export const login = async (req, res) => {
 
 export const logout=async(req,res)=>{
   try {
-    const res=await Logout();
-    res.status(200).send(res)
+    const response=await Logout();
+    res.status(200).send(response)
   } catch (error) {
     res.status(401).send({ error: error.message });
   }

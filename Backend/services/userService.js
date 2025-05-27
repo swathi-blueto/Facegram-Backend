@@ -7,13 +7,13 @@ export const updateProfileUser = async (userData) => {
     let profilePicUrl = null;
     let coverPhotoUrl = null;
 
-    // Prepare update data
+    
     const updateData = {
       ...otherData,
      
     };
 
-    // Handle profile picture upload
+   
     if (profile_pic) {
       const profilePicPath = `users/${id}/profile-pic.jpg`;
       const { error: uploadError } = await supabase.storage
@@ -28,7 +28,7 @@ export const updateProfileUser = async (userData) => {
       updateData.profile_pic = profilePicUrl;
     }
 
-    // Handle cover photo upload
+    
     if (cover_photo) {
       const coverPhotoPath = `users/${id}/cover-photo.jpg`;
       const { error: uploadError } = await supabase.storage
@@ -43,7 +43,7 @@ export const updateProfileUser = async (userData) => {
       updateData.cover_photo = coverPhotoUrl;
     }
 
-    // Perform the update
+    
     const { error: updateError } = await supabase
       .from('users')
       .update(updateData)
@@ -54,7 +54,7 @@ export const updateProfileUser = async (userData) => {
       throw new Error('User update failed: ' + updateError.message);
     }
 
-    // Fetch the updated user separately
+   
     const { data: updatedUser, error: fetchError } = await supabase
       .from('users')
       .select('*')
@@ -63,7 +63,7 @@ export const updateProfileUser = async (userData) => {
 
     if (fetchError) {
       console.warn('Update succeeded but fetch failed - likely RLS issue');
-      // Return at least the data we tried to update
+    
       return { id, ...updateData };
     }
 
@@ -84,13 +84,12 @@ export const updateProfileUser = async (userData) => {
 export const userProfile = async ({ id }) => {
     try {
      
+      const cleanId = id.startsWith(':') ? id.slice(1) : id;
       const { data, error } = await supabase
         .from("users")
         .select("*")
-        .eq("id", id)
+        .eq("id", cleanId)
         
-  
-
 
       if (error) {
         throw new Error("Failed to fetch user profile: " + error.message);
@@ -105,5 +104,25 @@ export const userProfile = async ({ id }) => {
       console.error("userProfile error:", error.message);
       throw error;
     }
+  };
+  
+
+  export const searchUsersService = async (query) => {
+    
+    // const { data: allUsers } = await supabase
+    //   .from("users")
+    //   .select("*");
+    
+    const { data, error } = await supabase
+      .from("users")
+      .select("*")
+      .ilike("first_name", `%${query}%`);
+  
+    if (error) {
+      throw new Error("Search failed: " + error.message);
+    }
+  
+    // console.log("Search result:", data);
+    return data;
   };
   

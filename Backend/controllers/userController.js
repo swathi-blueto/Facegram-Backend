@@ -1,10 +1,19 @@
-import { userProfile ,updateProfileUser} from "../services/userService.js";
-import { profileSchema } from "../validations/userValidations.js";
+import { userProfile ,updateProfileUser,searchUsersService} from "../services/userService.js";
+import { profileSchema } from "../validations/validations.js";
 
 
 export const updateProfile = async (req, res) => {
   try {
-    const id = req.params.id;
+    let id = req.params.id;
+
+     if (id.startsWith(':')) {
+      id = id.slice(1);
+    }
+
+
+
+    console.log('Received user ID:', req.params.id);
+
 
     const {
       phone,
@@ -14,7 +23,6 @@ export const updateProfile = async (req, res) => {
       country,
       hometown,
       bio,
-      website,
       work,
       education,
       relationship_status
@@ -34,7 +42,7 @@ export const updateProfile = async (req, res) => {
         country,
         hometown,
         bio,
-        website,
+        // website,
         work,
         education,
         relationship_status,
@@ -61,7 +69,7 @@ export const updateProfile = async (req, res) => {
       country,
       hometown,
       bio,
-      website,
+      // website,
       work,
       education,
       relationship_status,
@@ -91,5 +99,24 @@ export const getUserProfile = async (req, res) => {
       });
   } catch (error) {
     res.status(400).send({ error: error.message });
+  }
+};
+
+
+
+export const searchUsers = async (req, res) => {
+  try {
+    const query = req.query.q?.trim();
+    
+
+    if (!query) {
+      return res.status(400).json({ error: "Search query is required" });
+    }
+
+    const results = await searchUsersService(query);
+    console.log(results,"res")
+    res.status(200).json({ message: "Search successful", data: results });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };

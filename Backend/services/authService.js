@@ -39,29 +39,70 @@ export const Signup = async ({ first_name, last_name, email, password }) => {
   }
 };
 
+// export const Login = async ({ email, password }) => {
+//   try {
+//     const { data: authUser, error: authError } =
+//       await supabase.auth.signInWithPassword({
+//         email,
+//         password,
+//       });
+
+//       // console.log(authUser.session.access_token);
+
+//     if (authError) throw new Error("Login failed: " + authError.message);
+    
+
+//     const { data: userProfile, error: profileError } = await supabase
+//       .from("users")
+//       .select("id, first_name, last_name, email, role")
+//       .eq("email", email)
+//       .single();
+
+//     if (profileError) throw new Error("Failed to fetch user profile");
+
+//     return { email: authUser.user, role: userProfile.role };
+//   } catch (error) {
+//     throw error;
+//   }
+// };
+
 export const Login = async ({ email, password }) => {
   try {
+    
     const { data: authUser, error: authError } =
       await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
+    
     if (authError) throw new Error("Login failed: " + authError.message);
 
+   
     const { data: userProfile, error: profileError } = await supabase
       .from("users")
       .select("id, first_name, last_name, email, role")
       .eq("email", email)
       .single();
 
+    
     if (profileError) throw new Error("Failed to fetch user profile");
 
-    return { email: authUser.user.email, role: userProfile.role };
+    
+    return {
+      token: authUser.session.access_token,  
+      email: authUser.user.email,  
+      id:authUser.user.id,
+      role: userProfile.role,
+      firstName: userProfile.first_name,  
+      lastName: userProfile.last_name,  
+    };
   } catch (error) {
+    
     throw error;
   }
 };
+
 
 export const Logout = async () => {
   try {

@@ -16,7 +16,7 @@ export const profileSchema = Joi.object({
   country: Joi.string().max(50).allow(null, ''),
   hometown: Joi.string().max(50).allow(null, ''),
   bio: Joi.string().max(300).allow(null, ''),
-  website: Joi.string().uri().allow(null, ''),
+  // website: Joi.string().uri().allow(null, ''),
   work: Joi.string().max(100).allow(null, ''),
   education: Joi.string().max(100).allow(null, ''),
   relationship_status: Joi.string().valid("single", "married", "in a relationship", "other").allow(null, ''),
@@ -25,11 +25,9 @@ export const profileSchema = Joi.object({
 });
 
 
-// In your validation file (userValidations.js)
 export const createPostSchema = Joi.object({
   user_id: Joi.string().required(),
   content: Joi.string().allow('').optional(),
   visibility: Joi.string().valid('public', 'friends', 'private').required(),
-  // Removed image_url validation here
   image_file:Joi.any()
 });
