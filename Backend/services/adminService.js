@@ -1,6 +1,6 @@
 import { supabase } from "../config/db.js";
 
-// USERS
+
 export const getAllUsersService = async () => {
   const { data, error } = await supabase.from("users").select("*");
   if (error) throw new Error("Failed to fetch users: " + error.message);
