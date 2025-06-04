@@ -24,24 +24,25 @@ export const getUserNotifications = async (userId) => {
 
 
 
-// export const markNotificationAsRead = async (notificationId, userId) => {
-//   const { data, error } = await supabase
-//     .from("notifications")
-//     .update({ is_read: true })
-//     .eq("id", notificationId)
-//     .eq("user_id", userId);
-
-//   if (error) throw new Error("Failed to update notification: " + error.message);
-//   return data;
-// };
+// notificationService.js
+export const markNotificationAsRead = async (notificationId, userId) => {
+  const { data, error } = await supabase
+    .from("notifications")
+    .update({ is_read: true })
+    .eq("id", notificationId)
+    .eq("user_id", userId);
+console.log(data,"success")
+  if (error) throw new Error("Failed to update notification: " + error.message);
+  return data;
+};
 
 
 export const deleteNotification = async (notificationId, userId) => {
-  const { error } = await supabase
+  const { data,error } = await supabase
     .from("notifications")
     .delete()
     .eq("id", notificationId)
     .eq("user_id", userId);
-
+console.log(data,"success")
   if (error) throw new Error("Failed to delete notification: " + error.message);
 };

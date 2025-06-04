@@ -68,37 +68,40 @@ export const Signup = async ({ first_name, last_name, email, password }) => {
 
 export const Login = async ({ email, password }) => {
   try {
-    
+   
     const { data: authUser, error: authError } =
       await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-    
     if (authError) throw new Error("Login failed: " + authError.message);
 
-   
+    
     const { data: userProfile, error: profileError } = await supabase
       .from("users")
-      .select("id, first_name, last_name, email, role")
+      .select("id, first_name, last_name, email, role, is_blocked")
       .eq("email", email)
       .single();
 
-    
     if (profileError) throw new Error("Failed to fetch user profile");
 
-    
+   
+    if (userProfile.is_blocked) {
+   
+      await supabase.auth.signOut();
+      throw new Error("Your account has been blocked by admin. Please contact support.");
+    }
+
     return {
-      token: authUser.session.access_token,  
-      email: authUser.user.email,  
-      id:authUser.user.id,
+      token: authUser.session.access_token,
+      email: authUser.user.email,
+      id: authUser.user.id,
       role: userProfile.role,
-      firstName: userProfile.first_name,  
-      lastName: userProfile.last_name,  
+      firstName: userProfile.first_name,
+      lastName: userProfile.last_name,
     };
   } catch (error) {
-    
     throw error;
   }
 };

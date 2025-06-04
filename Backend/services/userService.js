@@ -82,29 +82,57 @@ export const updateProfileUser = async (userData) => {
 
 
 export const userProfile = async ({ id }) => {
-    try {
-     
-      const cleanId = id.startsWith(':') ? id.slice(1) : id;
-      const { data, error } = await supabase
-        .from("users")
-        .select("*")
-        .eq("id", cleanId)
-        
+  try {
+    const cleanId = id.startsWith(':') ? id.slice(1) : id;
+    
+    
+    const requiredFields = [
+      'first_name',
+      'last_name',
+      'profile_pic',
+      'cover_photo',
+      'bio',
+      'city'
+    ];
 
-      if (error) {
-        throw new Error("Failed to fetch user profile: " + error.message);
-      }
+    
+    const { data, error } = await supabase
+      .from("users")
+      .select("*")
+      .eq("id", cleanId)
+      .single(); 
 
-      if (!data || data.length === 0) {
-        throw new Error("No user found with this ID.");
-      }
-  
-      return data;
-    } catch (error) {
-      console.error("userProfile error:", error.message);
-      throw error;
+    if (error) {
+      throw new Error("Failed to fetch user profile: " + error.message);
     }
-  };
+
+    if (!data) {
+      throw new Error("No user found with this ID.");
+    }
+
+
+    const isProfileComplete = requiredFields.every(field => 
+      data[field] !== null && data[field] !== ''
+    );
+
+    if (!isProfileComplete) {
+      return {
+        status: 'incomplete',
+        message: 'Please complete your profile',
+        user: data 
+      };
+    }
+
+    return {
+      status: 'complete',
+      user: data
+    };
+
+  } catch (error) {
+    console.error("userProfile error:", error.message);
+    throw error;
+  }
+};
   
 
   export const searchUsersService = async (query) => {

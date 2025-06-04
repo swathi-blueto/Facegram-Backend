@@ -1,6 +1,6 @@
 import {
     getUserNotifications,
-  
+    markNotificationAsRead,
     deleteNotification,
   } from "../services/notificationService.js";
   
@@ -28,16 +28,22 @@ import {
 };
   
 
-//   export const markAsRead = async (req, res) => {
-//     try {
-//       const notificationId = req.params.id;
-//       const userId = req.user.id;
-//       const data = await markNotificationAsRead(notificationId, userId);
-//       res.json(data);
-//     } catch (err) {
-//       res.status(500).json({ error: err.message });
-//     }
-//   };
+export const markAsRead = async (req, res) => {
+  try {
+    const notificationId = req.params.id;
+    const userId = req.user.id; // Get from authenticated user
+    
+    if (!notificationId || !userId) {
+      return res.status(400).json({ error: "Missing required parameters" });
+    }
+
+    const data = await markNotificationAsRead(notificationId, userId);
+    res.json({ success: true, data });
+  } catch (err) {
+    console.error("Error marking notification as read:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
   
   
   export const deleteNotif = async (req, res) => {

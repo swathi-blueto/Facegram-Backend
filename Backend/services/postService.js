@@ -52,39 +52,90 @@ export const createPostService = async ({
 };
 
 
-export const getPosts = async () => {
-  try {
-    const { data, error } = await supabase
-      .from("posts")
-      .select(`
-        id, 
-        user_id, 
-        content, 
-        image_url, 
-        created_at, 
-        likes, 
-        comments,
-        users ( first_name, profile_pic )  
-      `);
+// export const getPosts = async () => {
+//   try {
+//     const { data, error } = await supabase
+//       .from("posts")
+//       .select(`
+//         id, 
+//         user_id, 
+//         content, 
+//         image_url, 
+//         created_at, 
+//         likes, 
+//         comments,
+//         users ( first_name, profile_pic )  
+//       `);
 
-    if (error) {
-      throw new Error("Failed to fetch posts: " + error.message);
-    }
+//     if (error) {
+//       throw new Error("Failed to fetch posts: " + error.message);
+//     }
 
-    if (!data || data.length === 0) {
-      throw new Error("No posts found");
-    }
+//     if (!data || data.length === 0) {
+//       throw new Error("No posts found");
+//     }
 
   
-    const formattedData = data.map(post => ({
+//     const formattedData = data.map(post => ({
+//       ...post,
+//       user_first_name: post.users?.first_name || "Unknown User",  
+//       user_profile_pic: post.users?.profile_pic || "",  
+//     }));
+
+//     return formattedData;
+//   } catch (error) {
+//     console.error("Post error:", error.message);
+//     throw error;
+//   }
+// };
+
+
+export const getPosts = async (currentUserId) => {
+  try {
+    
+    const { data: friendsData, error: friendsError } = await supabase
+      .from("friends")
+      .select("sender_id, receiver_id, status")
+      .or(`and(sender_id.eq.${currentUserId},status.eq.accepted),and(receiver_id.eq.${currentUserId},status.eq.accepted)`);
+
+    if (friendsError) throw new Error(friendsError.message);
+
+   
+    const friendIds = friendsData.map(friendship => 
+      friendship.sender_id === currentUserId 
+        ? friendship.receiver_id 
+        : friendship.sender_id
+    );
+
+    
+    const allUserIds = [...friendIds, currentUserId];
+
+    
+    const { data: posts, error: postsError } = await supabase
+      .from('posts')
+      .select(`
+        id,
+        user_id,
+        content,
+        image_url,
+        created_at,
+        likes,
+        comments,
+        users!inner(first_name, profile_pic)
+      `)
+      .in('user_id', allUserIds)
+      .order('created_at', { ascending: false });
+
+    if (postsError) throw new Error(postsError.message);
+
+    return posts.map(post => ({
       ...post,
-      user_first_name: post.users?.first_name || "Unknown User",  
-      user_profile_pic: post.users?.profile_pic || "",  
+      user_first_name: post.users.first_name,
+      user_profile_pic: post.users.profile_pic
     }));
 
-    return formattedData;
   } catch (error) {
-    console.error("Post error:", error.message);
+    console.error('Error in getPosts:', error);
     throw error;
   }
 };

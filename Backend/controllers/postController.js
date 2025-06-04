@@ -44,16 +44,16 @@ export const createPost = async (req, res) => {
   }
 };
 
+
 export const getAllPost = async (req, res) => {
   try {
-    const response = await getPosts();
-    if (response) {
-      return res.status(200).json({
-        message: "Posts Fetched Successfully",
-        data: response,
-      });
-    }
-    return response;
+    const currentUserId = req.user.id;
+    const response = await getPosts(currentUserId);
+    
+    return res.status(200).json({
+      message: "Posts Fetched Successfully",
+      data: response,
+    });
   } catch (error) {
     return res.status(500).json({
       error: error.message,
@@ -101,27 +101,7 @@ export const likePost = async (req, res) => {
 
 
 
-// export const commentPost = async (req, res) => {
-//   try {
-//     const id = req.params.id;
-//     const { commentText } = req.body;
 
-//     if (!commentText || typeof commentText !== "string") {
-//       return res.status(400).json({ error: "Comment text is required" });
-//     }
-
-//     const response = await commentPosts(id, commentText);
-
-//     return res.status(200).json({
-//       message: "Comment added successfully",
-//       data: response,
-//     });
-//   } catch (error) {
-//     return res.status(500).json({
-//       error: error.message,
-//     });
-//   }
-// };
 
 
 export const commentPost = async (req, res) => {

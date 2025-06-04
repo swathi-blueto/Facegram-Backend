@@ -43,12 +43,10 @@ export const getMessages = async (req, res) => {
     const { chatId } = req.params;
     // console.log(chatId);
 
-    const userId=req.user.id;
+    const userId = req.user.id;
 
-    
-    const messages = await fetchMessages(chatId,userId);
+    const messages = await fetchMessages(chatId, userId);
 
-    
     res.status(200).json({ messages });
   } catch (err) {
     res.status(500).json({ error: err.message });

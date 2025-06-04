@@ -16,7 +16,7 @@ router.post('/', upload.single('image_file'), (req, res, next) => {
     next();
   }, createPost);
   
-router.get("/",getAllPost)
+router.get("/",authenticate,getAllPost)
 router.get("/:id",getPostByUserId)
 router.put("/:id",editPost)
 router.delete("/:id",deletePost)
